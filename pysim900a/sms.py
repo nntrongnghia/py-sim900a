@@ -11,11 +11,11 @@ class SMS:
             raise ValueError("No read status in raw data")
         self.is_new = status.group() == "REC READ"
 
-        phone = re.search(r'(\+84\d+)', raw)
-        if phone is None:
+        self.phone = None
+        phone = re.findall(r'READ\",\"([^\"]+)\"', raw)
+        if not phone:
             raise ValueError("No phone number in raw data")
-        # print(phone.group())
-        self.phone = phone.group()
+        self.phone = phone[0]
 
         dstr = re.search(r'(\d\d/\d\d/\d\d,\d\d:\d\d)', raw)
         if dstr is None:
