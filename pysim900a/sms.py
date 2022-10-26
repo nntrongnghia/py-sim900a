@@ -6,10 +6,10 @@ class SMS:
     def __init__(self, raw: str):
         self.raw = raw
 
-        status = re.search(r'\"(REC READ|REC UNREAD)\"', raw)
-        if status is None:
+        status = re.findall(r'\"(REC READ|REC UNREAD)\"', raw)
+        if len(status) == 0:
             raise ValueError("No read status in raw data")
-        self.is_new = status.group() == "REC READ"
+        self.is_new = "REC READ" not in status[0]
 
         self.phone = None
         phone = re.findall(r'READ\",\"([^\"]+)\"', raw)

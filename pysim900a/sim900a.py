@@ -20,6 +20,9 @@ class SIM900A:
 
     def sim_init(self):
         logging.info("Init SIM900A ...")
+        # reset config
+        self.ser.write(b'ATZ\r')
+        time.sleep(5)
         # no echo
         self.ser.write(b'ATE0\r')
         time.sleep(0.2)
@@ -74,12 +77,20 @@ class SIM900A:
     def read_all_sms(self):
         self.ser.write(b'AT+CMGL="ALL"\r')
         time.sleep(1)
-        rcv = self.ser.read(self.ser.in_waiting).decode("utf-8").replace('\r', '')
-        sms = re.findall(r'(\+CMGL: \d.*\n.*)', rcv)
-        return [SMS(s) for s in sms]
+        try:
+            rcv = self.ser.read(self.ser.in_waiting).decode("utf-8").replace('\r', '')
+            sms = re.findall(r'(\+CMGL: \d.*\n.*)', rcv)
+            return [SMS(s) for s in sms]
+        except Exception as e:
+            logging.error(e)
+            logging.error("Reset SIM900A")
+            self.ser.write(b'ATZ\r')
+            time.sleep(5)
+            self.sim_init()
+            return []
 
-    def delete_all_sms(self):
-        self.ser.write(b'AT+CMGDA="DEL ALL"\r')
+    def delete_all_read_sms(self):
+        self.ser.write(b'AT+CMGDA="DEL READ"\r')
         time.sleep(1)
         self.ser.flushOutput()
 
