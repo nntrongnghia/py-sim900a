@@ -27,3 +27,6 @@ class SMS:
         
     def __repr__(self) -> str:
         return f"New: {self.is_new}\nFrom: {self.phone} - {self.datetime}\n{self.msg}"
+
+    def __str__(self) -> str:
+        return self.__repr__()
